@@ -37,8 +37,22 @@ if errorlevel 1 (
 
 :: Copy assets into the dist folder alongside the exe
 echo [4/4] Copying assets...
-xcopy /E /I /Y "nvidiaProfileInspector" "dist\SexytexBdoLauncher\nvidiaProfileInspector\" >nul
-xcopy /E /I /Y "profiles"               "dist\SexytexBdoLauncher\profiles\"               >nul
+if not exist "dist\SexytexBdoLauncher\" (
+    echo [ERROR] Output folder not found: dist\SexytexBdoLauncher\
+    pause & exit /b 1
+)
+
+if not exist "assets\nvidiaProfileInspector\" (
+    echo [ERROR] File not found - assets\nvidiaProfileInspector
+    pause & exit /b 1
+)
+if not exist "assets\profiles\" (
+    echo [ERROR] File not found - assets\profiles
+    pause & exit /b 1
+)
+
+xcopy /E /I /Y "assets\nvidiaProfileInspector" "dist\SexytexBdoLauncher\nvidiaProfileInspector\" >nul
+xcopy /E /I /Y "assets\profiles"               "dist\SexytexBdoLauncher\profiles\"               >nul
 
 echo.
 echo  ✓ Build complete!

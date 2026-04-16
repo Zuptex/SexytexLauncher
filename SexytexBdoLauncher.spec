@@ -2,6 +2,8 @@
 # SexytexBdoLauncher.spec
 # Run with: pyinstaller SexytexBdoLauncher.spec
 
+from PyInstaller.building.datastruct import Tree
+
 block_cipher = None
 
 a = Analysis(
@@ -51,6 +53,9 @@ coll = COLLECT(
     a.binaries,
     a.zipfiles,
     a.datas,
+    # Bundle these folders next to the built exe in the onedir dist output.
+    Tree('assets/nvidiaProfileInspector', prefix='nvidiaProfileInspector'),
+    Tree('assets/profiles', prefix='profiles'),
     strip=False,
     upx=True,
     upx_exclude=[],
