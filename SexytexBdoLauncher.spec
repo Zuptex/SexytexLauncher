@@ -42,7 +42,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    # icon='assets/icon.ico',   # uncomment and add your .ico for a custom icon
+    # icon='assets/icon.ico',
 )
 
 # COLLECT puts the exe + all Python runtime files into dist/SexytexBdoLauncher/
@@ -53,9 +53,6 @@ coll = COLLECT(
     a.binaries,
     a.zipfiles,
     a.datas,
-    # Bundle these folders next to the built exe in the onedir dist output.
-    Tree('assets/nvidiaProfileInspector', prefix='nvidiaProfileInspector'),
-    Tree('assets/profiles', prefix='profiles'),
     strip=False,
     upx=True,
     upx_exclude=[],
