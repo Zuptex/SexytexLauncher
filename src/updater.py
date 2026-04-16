@@ -6,7 +6,7 @@ import urllib.error
 import json
 import re
 
-APP_VERSION  = "1.0.0"
+APP_VERSION  = "1.0.1"
 GITHUB_REPO  = "Zuptex/SexytexLauncher"
 API_URL      = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 TIMEOUT      = 5   # seconds
