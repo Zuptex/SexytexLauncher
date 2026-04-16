@@ -2,7 +2,7 @@
 
 A GUI launcher for **Black Desert Online** that switches NVIDIA GPU profiles via [nvidiaProfileInspector](https://github.com/Orbmu2k/nvidiaProfileInspector) before launching the game.
 
-![SexytexBDO Launcher](.github/screenshot.png)
+![SexytexBDO Launcher]([.github/screenshot.png](https://github.com/Zuptex/SexytexLauncher/blob/main/screenshot.png))
 
 ## Features
 
