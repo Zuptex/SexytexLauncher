@@ -35,6 +35,7 @@ exe = EXE(
     upx_exclude=[],
     console=False,              # no black console window
     disable_windowed_traceback=False,
+    uac_admin=True,             # always prompt for admin
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
