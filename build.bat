@@ -1,0 +1,55 @@
+@echo off
+chcp 65001 >nul
+echo.
+echo  ═══════════════════════════════════════════
+echo   SexytexBDO Launcher — Build Script
+echo  ═══════════════════════════════════════════
+echo.
+
+:: Check Python
+python --version >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] Python not found. Install Python 3.10+ from python.org
+    pause & exit /b 1
+)
+
+:: Install/upgrade PyInstaller
+echo [1/4] Installing PyInstaller...
+pip install pyinstaller --quiet --upgrade
+if errorlevel 1 (
+    echo [ERROR] pip failed.
+    pause & exit /b 1
+)
+
+:: Clean previous build
+echo [2/4] Cleaning previous build...
+if exist dist rmdir /s /q dist
+if exist build rmdir /s /q build
+
+:: Build (onedir mode — exe + _internal\ in one folder)
+echo [3/4] Building...
+python -m PyInstaller SexytexBdoLauncher.spec --noconfirm
+if errorlevel 1 (
+    echo.
+    echo [ERROR] Build failed. Check output above.
+    pause & exit /b 1
+)
+
+:: Copy assets into the dist folder alongside the exe
+echo [4/4] Copying assets...
+xcopy /E /I /Y "nvidiaProfileInspector" "dist\SexytexBdoLauncher\nvidiaProfileInspector\" >nul
+xcopy /E /I /Y "profiles"               "dist\SexytexBdoLauncher\profiles\"               >nul
+
+echo.
+echo  ✓ Build complete!
+echo.
+echo  Output folder: dist\SexytexBdoLauncher\
+echo    SexytexBdoLauncher.exe   (the launcher)
+echo    _internal\               (Python runtime; must travel with exe)
+echo    nvidiaProfileInspector\
+echo    profiles\
+echo.
+echo  To distribute: zip the entire dist\SexytexBdoLauncher\ folder.
+echo  The exe works from any location as long as the folder contents stay together.
+echo.
+pause
