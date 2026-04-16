@@ -28,7 +28,12 @@ if exist build rmdir /s /q build
 
 :: Build (onedir mode — exe + _internal\ in one folder)
 echo [3/4] Building...
-python -m PyInstaller SexytexBdoLauncher.spec --noconfirm
+if not exist "assets\icon.ico" (
+    echo [ERROR] File not found - assets\icon.ico
+    pause & exit /b 1
+)
+
+python -m PyInstaller SexytexBdoLauncher.spec --noconfirm --clean
 if errorlevel 1 (
     echo.
     echo [ERROR] Build failed. Check output above.
