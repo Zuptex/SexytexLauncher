@@ -20,8 +20,6 @@ import ctypes
 from ctypes import wintypes
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
-# sys.executable = the .exe itself (onedir mode), so .parent = the folder it lives in.
-# In dev (not frozen), go up from src/ to the project root.
 if getattr(sys, 'frozen', False):
     BASE_DIR = Path(sys.executable).resolve().parent
 else:
@@ -444,9 +442,12 @@ class App(tk.Tk):
         if not PROFILES_DIR.exists():
             return
         profiles = self.cfg.get("profiles", {})
+        hidden_files = set(self.cfg.get("hidden_profile_files", []) or [])
         known_paths = {Path(p).resolve() for p in profiles.values()}
         added = []
         for nip in sorted(PROFILES_DIR.glob("*.nip")):
+            if nip.name in hidden_files:
+                continue
             if nip.resolve() not in known_paths:
                 # Use filename without extension as the display name
                 name = nip.stem
@@ -545,18 +546,30 @@ class App(tk.Tk):
             if not n or not p:
                 messagebox.showerror("Error", "Name and path required.", parent=win)
                 return
-            if not Path(p).exists():
+            src = Path(p)
+            if not src.exists():
                 messagebox.showerror("Error", "Profile file not found.", parent=win)
                 return
 
             # Copy into profiles dir
-            dest = PROFILES_DIR / Path(p).name
+            dest = PROFILES_DIR / src.name
             PROFILES_DIR.mkdir(exist_ok=True)
-            shutil.copy2(p, dest)
+            try:
+                # If the user selected a file already inside profiles/, avoid same-file copy.
+                if src.resolve() != dest.resolve():
+                    shutil.copy2(src, dest)
+            except Exception as e:
+                messagebox.showerror("Error", f"Could not save profile file:\n{e}", parent=win)
+                return
 
             profiles = self.cfg.get("profiles", {})
             profiles[n] = str(dest)
             self.cfg.set("profiles", profiles)
+            # If the user is re-adding a previously hidden managed file, unhide it.
+            hidden = set(self.cfg.get("hidden_profile_files", []) or [])
+            if dest.name in hidden:
+                hidden.remove(dest.name)
+                self.cfg.set("hidden_profile_files", sorted(hidden))
             self.cfg.save()
             self._refresh_profiles()
             self._log(f"Profile '{n}' added.", "ok")
@@ -569,8 +582,24 @@ class App(tk.Tk):
         if not messagebox.askyesno("Delete Profile", f"Remove profile '{name}'?"):
             return
         profiles = self.cfg.get("profiles", {})
+        path = profiles.get(name)
         profiles.pop(name, None)
         self.cfg.set("profiles", profiles)
+        # If this profile is a managed file inside profiles/, hide it (do not delete)
+        try:
+            if path:
+                p = Path(path)
+                if p.exists():
+                    try:
+                        in_managed_dir = p.resolve().is_relative_to(PROFILES_DIR.resolve())
+                    except Exception:
+                        in_managed_dir = p.resolve().parent == PROFILES_DIR.resolve()
+                    if in_managed_dir:
+                        hidden = set(self.cfg.get("hidden_profile_files", []) or [])
+                        hidden.add(p.name)
+                        self.cfg.set("hidden_profile_files", sorted(hidden))
+        except Exception:
+            pass
         self.cfg.save()
         if self.selected_profile.get() == name:
             self.selected_profile.set("")

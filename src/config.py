@@ -13,6 +13,7 @@ class Config:
         "custom_exe":  "",
         "selected_profile": "",
         "profiles":    {},
+        "hidden_profile_files": [],
     }
 
     def __init__(self, path):
